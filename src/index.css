@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+body {
+  background-color: #020617; /* bg-slate-950 */
+  color: white;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Evita barras de rolagem no 3D */
+}
