@@ -1049,11 +1049,16 @@ const BlueSun = ({ position }: { position: [number, number, number] }) => {
         ))}
       </group>
 
-      {/* Flare de Lente Anamórfico Horizontal (Halo de Cinema) */}
-      <mesh rotation={[0, 0, 0]}>
-        <planeGeometry args={[32, 1.2]} />
-        <meshBasicMaterial color="#38bdf8" transparent opacity={0.25} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} depthWrite={false} />
-      </mesh>
+      {/* Halo Externo Esférico Cinemático (Isotrópico em 3D, sem bordas duras ou polígonos planos) */}
+      <Sphere args={[9.4, 32, 32]}>
+        <meshBasicMaterial 
+          color="#0284c7" 
+          transparent 
+          opacity={0.1} 
+          blending={THREE.AdditiveBlending} 
+          side={THREE.BackSide} 
+        />
+      </Sphere>
     </group>
   );
 };
