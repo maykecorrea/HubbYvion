@@ -8,42 +8,17 @@ import Planet from './Planet';
 export default function Portal3D() {
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#050505', position: 'absolute', top: 0, left: 0, zIndex: 50 }}>
-      {/* Título Principal à Esquerda (Azul com Metálico Escuro) */}
-      <div style={{ position: 'absolute', top: '32px', left: '40px', zIndex: 60, pointerEvents: 'none', userSelect: 'none' }}>
-        <h1 style={{ 
-          fontSize: '2.4rem', 
-          fontWeight: '900', 
-          textTransform: 'uppercase', 
-          letterSpacing: '5px', 
-          margin: 0, 
-          fontFamily: 'monospace',
-          background: 'linear-gradient(135deg, #e2e8f0 0%, #38bdf8 35%, #0284c7 70%, #0f172a 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 16px rgba(56, 189, 248, 0.45))'
-        }}>
+      {/* Título Principal (Responsivo: canto superior esquerdo com gradiente metálico) */}
+      <div className="absolute top-4 left-4 sm:top-8 sm:left-10 z-[60] pointer-events-none select-none">
+        <h1 className="text-xl sm:text-3xl md:text-[2.4rem] font-black uppercase tracking-[3px] sm:tracking-[5px] m-0 font-mono bg-gradient-to-br from-slate-100 via-sky-400 to-slate-900 bg-clip-text text-transparent drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] drop-shadow-[0_0_16px_rgba(56,189,248,0.45)]">
           Sistema Yvion
         </h1>
       </div>
 
-      {/* Texto de Instrução Centralizado no Topo */}
-      <div style={{ position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)', zIndex: 60, textAlign: 'center', pointerEvents: 'none', userSelect: 'none' }}>
-        <p style={{ 
-          color: '#ffffff', 
-          margin: 0, 
-          fontSize: '0.95rem', 
-          fontWeight: '500',
-          letterSpacing: '2px', 
-          fontFamily: 'sans-serif',
-          opacity: 0.9,
-          background: 'rgba(15, 23, 42, 0.65)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          padding: '6px 18px',
-          borderRadius: '20px',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.5)'
-        }}>
+      {/* Texto de Instrução (No desktop fica no topo; no mobile vai para o rodapé para nunca sobrepor) */}
+      <div className="absolute bottom-6 sm:bottom-auto sm:top-7 left-1/2 -translate-x-1/2 z-[60] text-center pointer-events-none select-none whitespace-nowrap">
+        <p className="text-white m-0 text-xs sm:text-sm md:text-[0.95rem] font-medium tracking-[2px] font-sans opacity-90 bg-slate-900/70 backdrop-blur-md px-4 py-1.5 sm:px-5 sm:py-2 rounded-full border border-white/12 shadow-[0_4px_15px_rgba(0,0,0,0.5)] flex items-center gap-2">
+          <span className="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
           Arraste para girar a órbita
         </p>
       </div>
@@ -67,7 +42,40 @@ export default function Portal3D() {
         <AdaptiveDpr pixelated={false} />
         <AdaptiveEvents />
 
-        <Suspense fallback={<Html center><div style={{color:'white', fontFamily:'sans-serif'}}>Carregando Universo AAA...</div></Html>}>
+        <Suspense fallback={
+          <Html center zIndexRange={[200, 0]}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '14px',
+              background: 'rgba(5, 10, 24, 0.92)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              padding: '20px 32px',
+              borderRadius: '16px',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              boxShadow: '0 0 35px rgba(56, 189, 248, 0.25), inset 0 0 20px rgba(56, 189, 248, 0.1)',
+              color: '#38bdf8',
+              fontFamily: 'monospace',
+              letterSpacing: '2px',
+              fontSize: '13px',
+              userSelect: 'none',
+              whiteSpace: 'nowrap'
+            }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                border: '3px solid rgba(56, 189, 248, 0.2)',
+                borderTopColor: '#38bdf8',
+                animation: 'yvionSpin 0.9s linear infinite'
+              }} />
+              <span>CARREGANDO UNIVERSO YVION...</span>
+              <style>{`@keyframes yvionSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+            </div>
+          </Html>
+        }>
           {/* Estúdio de Iluminação e Reflexão Procedural (Inicialização ultrarrápida sem downloads pesados) */}
           <Environment resolution={256}>
             <Lightformer form="ring" intensity={3} color="#38bdf8" scale={12} position={[0, 6, -10]} />
@@ -81,10 +89,10 @@ export default function Portal3D() {
           {/* O Sistema Solar e Planeta */}
           <Planet />
           
-          {/* Controles para o usuário girar com o mouse */}
+          {/* Controles de Navegação Balanceados (Limite de zoom seguro para não perder o Universo de vista) */}
           <OrbitControls 
             enableZoom={true} 
-            maxDistance={1000} 
+            maxDistance={140} 
             minDistance={4.5} 
             autoRotate={true}
             autoRotateSpeed={0.1} 

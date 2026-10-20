@@ -36,13 +36,13 @@ const Hotspot = ({
   isLarge?: boolean;
 }) => {
   const ref = useRef<THREE.Group>(null);
-  const pos = latLongToVector3(lat, lon, radius);
+  const pos = useMemo(() => latLongToVector3(lat, lon, radius), [lat, lon, radius]);
 
-  useFrame(() => {
+  useLayoutEffect(() => {
     if (ref.current) {
-      ref.current.lookAt(0, 0, 0); // Aponta para o centro
+      ref.current.lookAt(0, 0, 0); // Aponta para o centro na montagem (elimina 10 useFrame desnecessários)
     }
-  });
+  }, [pos]);
 
   return (
     <group position={pos} ref={ref}>
@@ -222,8 +222,8 @@ const DimensionalPortal = ({ position }: { position: [number, number, number] })
     `
   }), []);
 
-  // 600 partículas físicas de energia sendo sugadas da borda para o centro
-  const { positions, streamData, colors } = useMemo(() => {
+  // 600 partículas físicas de energia sendo sugadas da borda para o centro (Armazenadas em Ref para mutação em 60fps)
+  const { positions, colors, streamData } = useMemo(() => {
     const count = 600;
     const pos = new Float32Array(count * 3);
     const col = new Float32Array(count * 3);
@@ -243,8 +243,9 @@ const DimensionalPortal = ({ position }: { position: [number, number, number] })
       col[i * 3 + 1] = 0.9;
       col[i * 3 + 2] = 1.0;
     }
-    return { positions: pos, streamData: data, colors: col };
+    return { positions: pos, colors: col, streamData: data };
   }, []);
+  const streamDataRef = useRef(streamData);
 
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
@@ -260,6 +261,7 @@ const DimensionalPortal = ({ position }: { position: [number, number, number] })
       const colAttr = streamPointsRef.current.geometry.attributes.color;
       const posArr = posAttr.array as Float32Array;
       const colArr = colAttr.array as Float32Array;
+      const streamData = streamDataRef.current;
 
       for (let i = 0; i < streamData.length; i++) {
         const item = streamData[i];
@@ -1525,3 +1527,19 @@ export default function YvionPlanet() {
     </group>
   );
 }
+
+// Pré-carregamento de todas as texturas em segundo plano para eliminar qualquer pop-in
+useTexture.preload([
+  '/textures/earth_atmos_2048.jpg',
+  '/textures/earth_normal_2048.jpg',
+  '/textures/earth_specular_2048.jpg',
+  '/textures/earth_clouds_1024.png',
+  '/textures/earth_lights_2048.png',
+  '/textures/alien_sister_planet.jpg',
+  '/textures/alien_sister_planet_emissive.jpg',
+  '/textures/alien_sister_planet_bump.jpg',
+  '/textures/portal_mech_diffuse.jpg',
+  '/textures/portal_mech_normal.jpg',
+  '/textures/portal_mech_roughness.jpg',
+  '/textures/portal_mech_emissive.jpg'
+]);
